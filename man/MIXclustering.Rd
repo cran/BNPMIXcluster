@@ -263,7 +263,7 @@ cluster_estim_pov_iii <- MIXclustering(x=Y_data,
                              d_0_a = 1, d_1_a = 1,
                              d_0_b = 1, d_1_b = 1,
                              d_0_z = 2.1, d_1_z = 30,
-                             d_0_mu = 2.1, d_1_mu = 30
+                             d_0_mu = 2.1, d_1_mu = 30,
                              sampling_prob = sampling_prob_pov_iii
                              )
 
