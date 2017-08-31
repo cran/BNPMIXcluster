@@ -8,7 +8,7 @@ MIXclustering(x, var_type, n.iter_out = 1000, n.burn = 100, n.thin = 3,
   a_fix = NULL, alpha = 0.5, d_0_a = 1, d_1_a = 1, b_fix = NULL,
   d_0_b = 1, d_1_b = 5, eta = 2, d_0_z = 2.1, d_1_z = 30, kappa = 5,
   delta = 4, d_0_mu = 2.1, d_1_mu = 30, sampling_prob = NULL,
-  expansion_f = NULL, max.time = Inf)
+  expansion_f = NULL, max.time = Inf, USING_CPP = TRUE)
 }
 \arguments{
 \item{x}{Matrix or data frame containing the data to be clustered.}
@@ -59,6 +59,8 @@ MIXclustering(x, var_type, n.iter_out = 1000, n.burn = 100, n.thin = 3,
 \item{expansion_f}{vector with the expansion factors, the reciprocal of the sampling probabilities, \eqn{w_i = 1/\pi_i}. If both \code{sampling_prob} and \code{expansion_f} are specified, preference is given to \code{sampling_prob}.}
 
 \item{max.time}{Maximum time tolerated to be spend in the sampling procedure of the Metropolis-Hastings steps. If reached the routine is stopped with \code{error}.}
+
+\item{USING_CPP}{Indicates wheter to use optimized functions developed in C++ (TRUE default)}
 }
 \value{
 \code{MIXclustering} returns a S3 object of class "\code{MIXcluster}".
@@ -152,7 +154,7 @@ colnames(Y_data) <- paste("Y",1:3,sep=".")
 
 cluster_estim_Ic <- MIXclustering( Y_data,
                           var_type=c("c","c","c"),
-                          n.iter_out=1000, #
+                          n.iter_out=1000,
                           n.burn=200,
                           n.thin=2,
                           alpha=0.5,
@@ -166,7 +168,7 @@ cluster_estim_Ic
 # Summary of clustering results
 summary(cluster_estim_Ic)
 
-# Grafical representation of clustering results
+# Representation of clustering results
 plot(cluster_estim_Ic,type="heatmap")
 plot(cluster_estim_Ic,type="chain")
 
@@ -177,6 +179,7 @@ plot(x=jitter(sim.cluster.data$cluster),
      xlab="Real cluster",
      ylab="Model cluster",
      pch=19, col="#FF000020")
+
 }
 
 
@@ -206,6 +209,7 @@ cluster_estim_IIb <- MIXclustering( Y_data,
 summary(cluster_estim_IIb)
 plot(cluster_estim_IIb,type="heatmap")
 plot(cluster_estim_IIb,type="chain")
+
 }
 
 
@@ -222,7 +226,7 @@ Y_data[,3] <- findInterval( sim.cluster.data[,4], c(-Inf,3,Inf) )-1
 Y_data[,4] <- rnorm(n=nrow(sim.cluster.data),mean=0,sd=1)
 
 cluster_estim_IIIa <- MIXclustering( Y_data,
-                          var_type=c("o","o","o","c"),
+                          var_type=c("m","o","o","c"),
                           n.iter_out=1000,
                           n.burn=200,
                           n.thin=2,
@@ -236,6 +240,7 @@ cluster_estim_IIIa <- MIXclustering( Y_data,
 summary(cluster_estim_IIIa)
 plot(cluster_estim_IIIa,type="heatmap")
 plot(cluster_estim_IIIa,type="chain")
+
 }
 
 
@@ -279,4 +284,3 @@ Carmona, C., Nieto-Barajas, L. E. & Canale, A. (2016). \emph{Model based approac
 \seealso{
 \code{\link{summary.MIXcluster}} for a summary of the clustering results, \code{\link{plot.MIXcluster}} for graphical representation of results.
 }
-
