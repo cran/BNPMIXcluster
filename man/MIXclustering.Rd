@@ -4,14 +4,14 @@
 \alias{MIXclustering}
 \title{Bayesian Nonparametric Model for Clustering with Mixed Scale Variables}
 \usage{
-MIXclustering(x, var_type, n.iter_out = 1000, n.burn = 100, n.thin = 3,
+MIXclustering(Y, var_type, n_iter_out = 2000, n_burn = 100, n_thin = 2,
   a_fix = NULL, alpha = 0.5, d_0_a = 1, d_1_a = 1, b_fix = NULL,
-  d_0_b = 1, d_1_b = 5, eta = 2, d_0_z = 2.1, d_1_z = 30, kappa = 5,
+  d_0_b = 1, d_1_b = 1, eta = 2, d_0_z = 2.1, d_1_z = 30, kappa = 5,
   delta = 4, d_0_mu = 2.1, d_1_mu = 30, sampling_prob = NULL,
-  expansion_f = NULL, max.time = Inf, USING_CPP = TRUE)
+  expansion_f = NULL, log_file = NULL)
 }
 \arguments{
-\item{x}{Matrix or data frame containing the data to be clustered.}
+\item{Y}{Matrix or data frame containing the data to be clustered.}
 
 \item{var_type}{Character vector that indicates the type of variable in each column of x. Three possible types:
 \itemize{
@@ -20,11 +20,11 @@ MIXclustering(x, var_type, n.iter_out = 1000, n.burn = 100, n.thin = 3,
   \item "\strong{m}" for nominal variables (non-ordered categorical).
 }}
 
-\item{n.iter_out}{Number of effective iterations in the MCMC procedure for clustering.}
+\item{n_iter_out}{Number of effective iterations in the MCMC procedure for clustering.}
 
-\item{n.burn}{Number of iterations discarded as part of the burn-in period at the beginning MCMC procedure.}
+\item{n_burn}{Number of iterations discarded as part of the burn-in period at the beginning MCMC procedure.}
 
-\item{n.thin}{Number of iterations discarded between two effective iterations, with the purpose of reducing the autocorrelation in the chain.}
+\item{n_thin}{Number of iterations discarded for thining the chain (reducing the autocorrelation). We keep 1 of every n_thin iterations.}
 
 \item{a_fix}{A numeric value to set the parameter \eqn{a} in the model. If \code{NULL} (default), the parameter \eqn{a} is assigned a prior distribution. See \code{details}.}
 
@@ -50,17 +50,15 @@ MIXclustering(x, var_type, n.iter_out = 1000, n.burn = 100, n.thin = 3,
 
 \item{delta}{Tuning parameter controlling the proposal in the \emph{Metropolis-Hastings} step for the correlation of latent variables.}
 
-\item{d_0_mu}{Hyperparameter in the prior distribution of the variance within each cluster. See \code{details}.}
+\item{d_0_mu}{Hyperparameter in the prior distribution of the variance of the location in each cluster. See \code{details}.}
 
-\item{d_1_mu}{Hyperparameter in the prior distribution of the variance within each cluster. See \code{details}.}
+\item{d_1_mu}{Hyperparameter in the prior distribution of the variance of the location in each cluster. See \code{details}.}
 
 \item{sampling_prob}{vector with the sampling probabilities \eqn{\pi_i} for each individual in case that the data come from a complex survey sample. By default \eqn{\pi_i=1}.}
 
 \item{expansion_f}{vector with the expansion factors, the reciprocal of the sampling probabilities, \eqn{w_i = 1/\pi_i}. If both \code{sampling_prob} and \code{expansion_f} are specified, preference is given to \code{sampling_prob}.}
 
-\item{max.time}{Maximum time tolerated to be spend in the sampling procedure of the Metropolis-Hastings steps. If reached the routine is stopped with \code{error}.}
-
-\item{USING_CPP}{Indicates wheter to use optimized functions developed in C++ (TRUE default)}
+\item{log_file}{Specifies a file to save the details with the execution time and the parameters used.}
 }
 \value{
 \code{MIXclustering} returns a S3 object of class "\code{MIXcluster}".
@@ -69,13 +67,15 @@ The generic methods \code{\link{summary}} and \code{\link{plot}} are defined for
 
 An object of class "MIXcluster" is a list containing the following components:
 \describe{
-    \item{\code{cluster}}{vector with the cluster allocation for each each row in the data. It corresponds to the iteration which is Closest-To-Average (CTA) arrangement.}
+    \item{\code{cluster}}{vector with the cluster allocation for each row in the data. It corresponds to the iteration which is Closest-To-Average (CTA) arrangement.}
+    \item{\code{cluster_heterogeneity}}{Heterogeneity Measure (HM) for the cluster in the previous point. The HM measure is discussed in section 4 of Carmona et al. (2017).}
     \item{\code{Y.cluster.summary}}{a summary of the data divided by the allocation in \code{$cluster}.}
     \item{\code{Y.var_type}}{vector with the variable types in the data.}
     \item{\code{Y.na}}{vector specifying the rows with missing values.}
     \item{\code{Y.n}}{number of rows in the data.}
     \item{\code{Y.p}}{number of variables in the data.}
-    \item{\code{MC.clusters}}{matrix with the cluster allocation for each each row in the data. Each column corresponds to an effective iteration in the MCMC simulation of the model (after discarding burn-in and thinning iterations).}
+    \item{\code{MC.clusters}}{matrix with the cluster allocation for each row in the data. Each column corresponds to an effective iteration in the MCMC simulation of the model (after discarding burn-in and thinning iterations).}
+    \item{\code{MC.clusters_heterogeneity}}{Heterogeneity Measure (HM) for all the clusters returned in \code{MC.clusters}.}
     \item{\code{cluster.matrix.avg}}{average similarity matrix of size \eqn{n} by \eqn{n}.}
     \item{\code{MC.values}}{a list with the simulated values of the chains for the parameters \eqn{a},\eqn{b},\eqn{\Lambda},\eqn{\Omega}.}
     \item{\code{MC.accept.rate}}{a named vector with the acceptance rates for each parameter. It includes iterations that are discarded in the burn-in period and thinning.}
@@ -86,13 +86,15 @@ An object of class "MIXcluster" is a list containing the following components:
 \code{MIXclustering} is used to perform cluster analisis of individuals using a Bayesian nonparametric mixture model that jointly models mixed scale data and accommodates for different sampling probabilities. The model is described in Carmona, C., Nieto-Barajas, L. E., Canale, A. (2016).
 }
 \details{
-The model consists in a bayesian non-parametric approach for clustering that is capable to combine different types of variables through the usage of associated continuous latent variables. The clustering mechanism is based on a location mixture model with a Poisson-Dirichlet (\eqn{PD}) process prior on the location parameters \eqn{\mu_i ; i=1,...,n} of the associated latent variables.
+The model consists on a bayesian non-parametric approach for clustering that is capable to combine different types of variables through the usage of associated continuous latent variables. The clustering mechanism is based on a location mixture model with a Poisson-Dirichlet (\eqn{PD}) process prior on the location parameters \eqn{\mu_i ; i=1,...,n} of the associated latent variables.
 
 Computational inference about the cluster allocation and the posterior distribution of the parameters are performed using MCMC simulations.
 
 A full description of the model is in the article Carmona et al. (2016) (preprint: \url{http://arxiv.org/abs/1612.00083}). See \code{Reference}.
 
 The model consider an individual \eqn{y_i} that is characterized by a multivariate response of dimension \eqn{p}, i.e., \eqn{y_i=(y_{i,1},...,y_{i,p})}. The total number of variables \eqn{p} is divided into \eqn{c} continuous variables, \eqn{o} ordinal variables, and \eqn{m} nominal variables such that \eqn{p=c+o+m}.
+
+For the continuous variables, it is convenient that the variables have a real support. The user may have transformed the original values before using the function \code{MIXclustering}.
 
 For each response \eqn{y_i=(y_{i,1},...,y_{i,p})} (of dimension \eqn{p}) a corresponding latent vector \eqn{z_i=(z_{i,1},...,z_{i,q})} (of dimension \eqn{q}) is created, according to the following:
 \itemize{
@@ -137,149 +139,144 @@ Finally, the function parameters \code{eta}, \code{kappa}, \code{delta} are tuni
 }
 \examples{
 
-##### Testing "MIXclustering" function with simulated clustered data #####
-# for more information about the data...
+##############################
+#     Simulation study 1     #
+#    Carmona et al. (2017)   #
+##############################
+
+# Data and parameters are discussed in section 5.1 of Carmona et al. (2017) #
+
+# Set seed for reproducibility #
+set.seed(0) 
+
+
+# Specification of data Y #
+help(Y_ex_5_1)
+# Choose 1, 2, or 3 #
+ex_i <- 1
+
+# specification of parameters #
+help(meta_param_ex)
+# Choose "a", "b" or "c" #
+param_j <- "c"
+
+var_type_Y_ex_5_1 <- list( c("c","c","c"),
+                           c("o","o"),
+                           c("o","o","o","c") )
 \dontrun{
-help(sim.cluster.data)
-}
-
-
-### Exercise (Ic) from section 5.1 in Carmona et al. (2016)
-### using 3 continuous variables
-\dontrun{
-set.seed(0) # for reproducibility
-
-Y_data <- sim.cluster.data[,2:4]
-colnames(Y_data) <- paste("Y",1:3,sep=".")
-
-cluster_estim_Ic <- MIXclustering( Y_data,
-                          var_type=c("c","c","c"),
-                          n.iter_out=1000,
-                          n.burn=200,
-                          n.thin=2,
-                          alpha=0.5,
-                          d_0_a = 1, d_1_a = 1,
-                          d_0_b = 1, d_1_b = 1,
-                          d_0_z = 2.1, d_1_z = 30,
-                          d_0_mu = 2.1, d_1_mu = 30
-                          )
-cluster_estim_Ic
-
+cluster_ex <- MIXclustering( Y = as.matrix(Y_ex_5_1[[ ex_i ]]),
+                             var_type=var_type_Y_ex_5_1[[ ex_i ]],
+                             
+                             n_iter_out=1500,
+                             n_burn=200,
+                             n_thin=3,
+                             
+                             alpha = meta_param_ex[ param_j, "alpha" ],
+                             d_0_a = meta_param_ex[ param_j, "d_0_a"],
+                             d_1_a = meta_param_ex[ param_j, "d_1_a" ],
+                             d_0_b = meta_param_ex[ param_j, "d_0_b" ],
+                             d_1_b = meta_param_ex[ param_j, "d_1_b" ],
+                             eta = meta_param_ex[ param_j, "eta" ],
+                             kappa = meta_param_ex[ param_j, "kappa" ],
+                             delta = meta_param_ex[ param_j, "delta" ],
+                             
+                             d_0_z = meta_param_ex[ param_j, "d_0_z" ],
+                             d_1_z = meta_param_ex[ param_j, "d_1_z" ],
+                             d_0_mu = meta_param_ex[ param_j, "d_0_mu" ],
+                             d_1_mu = meta_param_ex[ param_j, "d_1_mu" ] )
 # Summary of clustering results
-summary(cluster_estim_Ic)
+summary(cluster_ex)
 
 # Representation of clustering results
-plot(cluster_estim_Ic,type="heatmap")
-plot(cluster_estim_Ic,type="chain")
+plot(cluster_ex,type="heatmap")
+plot(cluster_ex,type="chain")
+
+# Comparison of cluster configurations #
+# 1) Minimum distance with average MCMC iterations
+# 2) Minimum Heterogeneity Measure (HM)
+plot( x=jitter(cluster_ex$cluster),y=jitter(cluster_ex$clusterHMmin), col="#FF000080", pch=20,
+      main=paste("Comparison of two relevant cluster configurations"),
+      xlab="minimizes distance to average MCMC grouping", ylab="minimizes Heterogeneity Measure" )
 
 # Comparison with the original clusters in the simulated data
-plot(x=jitter(sim.cluster.data$cluster),
-     y=jitter(cluster_estim_Ic$cluster),
-     main="",
+plot(x=jitter(Z_latent_ex_5_1$cluster),
+     y=jitter(cluster_ex$cluster),
+     main=paste("Comparison real configuration with the model results"),
      xlab="Real cluster",
      ylab="Model cluster",
-     pch=19, col="#FF000020")
-
+     pch=19, col="#FF000080")
 }
 
+##############################
+#      Households data       #
+#    Carmona et al. (2017)   #
+##############################
 
-### Exercise (IIb) from section 5.1 in Carmona et al. (2016)
-### Two binary and one continuous variables
-\dontrun{
-set.seed(0) # for reproducibility
+# Testing "MIXclustering" function with poverty.data #
+# Data and parameters are discussed in section 5.3 of Carmona et al. (2017) #
 
-Y_data <- matrix(NA,nrow=nrow(sim.cluster.data),ncol=3)
-colnames(Y_data) <- paste("Y",1:3,sep=".")
-Y_data[,1] <- findInterval( sim.cluster.data[,2], c(-Inf,5,Inf) )-1
-Y_data[,2] <- sim.cluster.data[,3]
-Y_data[,3] <- findInterval( sim.cluster.data[,4], c(-Inf,3,Inf) )-1
+# Set seed for reproducibility #
+set.seed(0) 
 
-cluster_estim_IIb <- MIXclustering( Y_data,
-                          var_type=c("o","c","o"),
-                          n.iter_out=1000,
-                          n.burn=200,
-                          n.thin=2,
-                          alpha=0.5,
-                          d_0_a = 1, d_1_a = 1,
-                          d_0_b = 1, d_1_b = 1,
-                          d_0_z = 1, d_1_z = 1,
-                          d_0_mu = 1, d_1_mu = 1
-                          )
-
-summary(cluster_estim_IIb)
-plot(cluster_estim_IIb,type="heatmap")
-plot(cluster_estim_IIb,type="chain")
-
-}
-
-
-### Exercise (IIIa) from section 5.1 in Carmona et al. (2016)
-### Two binary, one ordinal, and one (non-informative) continuous variables
-\dontrun{
-set.seed(0) # for reproducibility
-
-Y_data <- matrix(NA,nrow=nrow(sim.cluster.data),ncol=4)
-colnames(Y_data) <- paste("Y",1:4,sep=".")
-Y_data[,1] <- findInterval( sim.cluster.data[,2], c(-Inf,5,Inf) )-1
-Y_data[,2] <- findInterval( sim.cluster.data[,3], c(-Inf,4,5,Inf) )-1
-Y_data[,3] <- findInterval( sim.cluster.data[,4], c(-Inf,3,Inf) )-1
-Y_data[,4] <- rnorm(n=nrow(sim.cluster.data),mean=0,sd=1)
-
-cluster_estim_IIIa <- MIXclustering( Y_data,
-                          var_type=c("m","o","o","c"),
-                          n.iter_out=1000,
-                          n.burn=200,
-                          n.thin=2,
-                          alpha=0.5,
-                          d_0_a = 1, d_1_a = 1,
-                          d_0_b = 1, d_1_b = 1,
-                          d_0_z = 0.1, d_1_z = 0.1,
-                          d_0_mu = 0.1, d_1_mu = 0.1
-                          )
-
-summary(cluster_estim_IIIa)
-plot(cluster_estim_IIIa,type="heatmap")
-plot(cluster_estim_IIIa,type="chain")
-
-}
-
-
-##### Testing "MIXclustering" function with poverty.data #####
-# Using entity 15 (Edomex) #
 
 \dontrun{
+# relevant variables for clustering households #
 Y_names <- c("ict_norm",
              "ic_ali","ic_asalud","ic_cv",
              "ic_rezedu","ic_sbv","ic_segsoc",
              "niv_ed","tam_loc")
+Y_var_type <- c("c","o","o","o","o","o","o","o","m")
+
+# using only data from state 15 (Edomex) #
 aux_subset <- rep(T,nrow(poverty.data))
 aux_subset <- aux_subset & is.element(substr(poverty.data$folioviv,1,2),"15")
 
 Y_data <- poverty.data[aux_subset,Y_names]
 
-sampling_prob_pov_iii <- 4 * mean(poverty.data[aux_subset,"factor_hog"])
-sampling_prob_pov_iii <- sampling_prob_pov_iii * 1/poverty.data[aux_subset,"factor_hog"]
+### Sampling probability dependin on the scenario ###
+# Scenario description in section 5.3 of Carmona et al. (2017) #
+# Choose 1, 2 or 3 #
+poverty_sampling_spec <- 3
 
-cluster_estim_pov_iii <- MIXclustering(x=Y_data,
-                             var_type=c("c","o","o","o","o","o","o","m","m"),
-                             n.iter_out=1000,
-                             n.burn=200,
-                             n.thin=2,
-                             d_0_a = 1, d_1_a = 1,
-                             d_0_b = 1, d_1_b = 1,
-                             d_0_z = 2.1, d_1_z = 30,
-                             d_0_mu = 2.1, d_1_mu = 30,
-                             sampling_prob = sampling_prob_pov_iii
-                             )
 
-summary(cluster_estim_pov_iii)
-plot(cluster_estim_pov_iii,type="heatmap")
-plot(cluster_estim_pov_iii,type="chain")
+if (poverty_sampling_spec == 1) {
+  k <- 1
+  sampling_prob_pov <- rep(1,nrow(Y_data))
+} else if (poverty_sampling_spec == 2) {
+  k <- 2 * mean(poverty.data[aux_subset,"factor_hog"])
+  sampling_prob_pov <- 1/poverty.data[aux_subset,"factor_hog"]
+} else if (poverty_sampling_spec == 3) {
+  k <- 4 * mean(poverty.data[aux_subset,"factor_hog"])
+  sampling_prob_pov <- 1/poverty.data[aux_subset,"factor_hog"]
+}
+
+cluster_poverty <- MIXclustering( Y=Y_data,
+                                  var_type=Y_var_type,
+                                  n_iter_out=1500,
+                                  n_burn=200,
+                                  n_thin=3,
+                                  
+                                  alpha = 0.5,
+                                  d_0_a = 1, d_1_a = 1,
+                                  d_0_b = 1, d_1_b = 1,
+                                  
+                                  eta = 2,
+                                  kappa = 5,
+                                  delta = 4,
+                                  
+                                  d_0_z = 2.1, d_1_z = 30,
+                                  d_0_mu = 2.1, d_1_mu = 30,
+                                  
+                                  sampling_prob = k * sampling_prob_pov )
+
+summary(cluster_poverty)
+plot(cluster_poverty,type="heatmap")
+plot(cluster_poverty,type="chain")
 }
 
 }
 \references{
-Carmona, C., Nieto-Barajas, L. E. & Canale, A. (2016). \emph{Model based approach for household clustering with mixed scale variables.} (preprint: \url{http://arxiv.org/abs/1612.00083})
+Carmona, C., Nieto-Barajas, L. E. & Canale, A. (2017). \emph{Model based approach for household clustering with mixed scale variables.} (preprint: \url{http://arxiv.org/abs/1612.00083})
 }
 \seealso{
 \code{\link{summary.MIXcluster}} for a summary of the clustering results, \code{\link{plot.MIXcluster}} for graphical representation of results.
