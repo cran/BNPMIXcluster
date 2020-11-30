@@ -2,11 +2,22 @@
 % Please edit documentation in R/sampling_b.R
 \name{sampling_b}
 \alias{sampling_b}
-\title{MCMC sampling of parameter "\eqn{b}" in the \emph{mixdpcluster} model for bayesian clustering.}
+\title{MCMC sampling of parameter "\eqn{b}" in the \emph{mixdpcluster} model for Bayesian clustering.}
 \usage{
-sampling_b(n_sim_mh = 1, b_ini, a, d_0_b, d_1_b, eta = 1, mu_star_n_r,
-  max.time = 10 * 60, n.burn = 0, accept_display = T, verbose = F,
-  USING_CPP = TRUE)
+sampling_b(
+  n_sim_mh = 1,
+  b_ini,
+  a,
+  d_0_b,
+  d_1_b,
+  eta = 1,
+  mu_star_n_r,
+  max.time = 10 * 60,
+  n.burn = 0,
+  accept_display = T,
+  verbose = F,
+  USING_CPP = TRUE
+)
 }
 \description{
 Generates a sample from the posterior distribution of \eqn{b} in the \emph{mixdpcluster} model for bayesian clustering.

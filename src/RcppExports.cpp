@@ -33,6 +33,10 @@ RcppExport SEXP _BNPMIXcluster_dmvnrm_arma(SEXP xSEXP, SEXP meanSEXP, SEXP sigma
         UNPROTECT(1);
         Rf_onintr();
     }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
     Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
     if (rcpp_isError_gen) {
         SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
@@ -55,37 +59,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::mat >::type Z_ini(Z_iniSEXP);
     Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
     rcpp_result_gen = Rcpp::wrap(get_latents_cpp(Y, var_type, mu_Z, sigma_Z, Z_ini, verbose));
-    return rcpp_result_gen;
-END_RCPP
-}
-// log_f_post_a_cpp
-double log_f_post_a_cpp(double a, double b, double alpha, double d_0_a, double d_1_a, arma::colvec mu_star_n_r);
-RcppExport SEXP _BNPMIXcluster_log_f_post_a_cpp(SEXP aSEXP, SEXP bSEXP, SEXP alphaSEXP, SEXP d_0_aSEXP, SEXP d_1_aSEXP, SEXP mu_star_n_rSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< double >::type a(aSEXP);
-    Rcpp::traits::input_parameter< double >::type b(bSEXP);
-    Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
-    Rcpp::traits::input_parameter< double >::type d_0_a(d_0_aSEXP);
-    Rcpp::traits::input_parameter< double >::type d_1_a(d_1_aSEXP);
-    Rcpp::traits::input_parameter< arma::colvec >::type mu_star_n_r(mu_star_n_rSEXP);
-    rcpp_result_gen = Rcpp::wrap(log_f_post_a_cpp(a, b, alpha, d_0_a, d_1_a, mu_star_n_r));
-    return rcpp_result_gen;
-END_RCPP
-}
-// log_f_post_b_cpp
-double log_f_post_b_cpp(double b, double a, double d_0_b, double d_1_b, arma::colvec mu_star_n_r);
-RcppExport SEXP _BNPMIXcluster_log_f_post_b_cpp(SEXP bSEXP, SEXP aSEXP, SEXP d_0_bSEXP, SEXP d_1_bSEXP, SEXP mu_star_n_rSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< double >::type b(bSEXP);
-    Rcpp::traits::input_parameter< double >::type a(aSEXP);
-    Rcpp::traits::input_parameter< double >::type d_0_b(d_0_bSEXP);
-    Rcpp::traits::input_parameter< double >::type d_1_b(d_1_bSEXP);
-    Rcpp::traits::input_parameter< arma::colvec >::type mu_star_n_r(mu_star_n_rSEXP);
-    rcpp_result_gen = Rcpp::wrap(log_f_post_b_cpp(b, a, d_0_b, d_1_b, mu_star_n_r));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -121,6 +94,37 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// log_f_post_a_cpp
+double log_f_post_a_cpp(double a, double b, double alpha, double d_0_a, double d_1_a, arma::colvec mu_star_n_r);
+RcppExport SEXP _BNPMIXcluster_log_f_post_a_cpp(SEXP aSEXP, SEXP bSEXP, SEXP alphaSEXP, SEXP d_0_aSEXP, SEXP d_1_aSEXP, SEXP mu_star_n_rSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type a(aSEXP);
+    Rcpp::traits::input_parameter< double >::type b(bSEXP);
+    Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
+    Rcpp::traits::input_parameter< double >::type d_0_a(d_0_aSEXP);
+    Rcpp::traits::input_parameter< double >::type d_1_a(d_1_aSEXP);
+    Rcpp::traits::input_parameter< arma::colvec >::type mu_star_n_r(mu_star_n_rSEXP);
+    rcpp_result_gen = Rcpp::wrap(log_f_post_a_cpp(a, b, alpha, d_0_a, d_1_a, mu_star_n_r));
+    return rcpp_result_gen;
+END_RCPP
+}
+// log_f_post_b_cpp
+double log_f_post_b_cpp(double b, double a, double d_0_b, double d_1_b, arma::colvec mu_star_n_r);
+RcppExport SEXP _BNPMIXcluster_log_f_post_b_cpp(SEXP bSEXP, SEXP aSEXP, SEXP d_0_bSEXP, SEXP d_1_bSEXP, SEXP mu_star_n_rSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type b(bSEXP);
+    Rcpp::traits::input_parameter< double >::type a(aSEXP);
+    Rcpp::traits::input_parameter< double >::type d_0_b(d_0_bSEXP);
+    Rcpp::traits::input_parameter< double >::type d_1_b(d_1_bSEXP);
+    Rcpp::traits::input_parameter< arma::colvec >::type mu_star_n_r(mu_star_n_rSEXP);
+    rcpp_result_gen = Rcpp::wrap(log_f_post_b_cpp(b, a, d_0_b, d_1_b, mu_star_n_r));
+    return rcpp_result_gen;
+END_RCPP
+}
 // rtn1
 double rtn1(const double mean, const double sd, const double low, const double high);
 static SEXP _BNPMIXcluster_rtn1_try(SEXP meanSEXP, SEXP sdSEXP, SEXP lowSEXP, SEXP highSEXP) {
@@ -144,6 +148,10 @@ RcppExport SEXP _BNPMIXcluster_rtn1(SEXP meanSEXP, SEXP sdSEXP, SEXP lowSEXP, SE
     if (rcpp_isInterrupt_gen) {
         UNPROTECT(1);
         Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
     }
     Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
     if (rcpp_isError_gen) {
@@ -176,10 +184,10 @@ RcppExport SEXP _BNPMIXcluster_RcppExport_registerCCallable() {
 static const R_CallMethodDef CallEntries[] = {
     {"_BNPMIXcluster_dmvnrm_arma", (DL_FUNC) &_BNPMIXcluster_dmvnrm_arma, 4},
     {"_BNPMIXcluster_get_latents_cpp", (DL_FUNC) &_BNPMIXcluster_get_latents_cpp, 6},
-    {"_BNPMIXcluster_log_f_post_a_cpp", (DL_FUNC) &_BNPMIXcluster_log_f_post_a_cpp, 6},
-    {"_BNPMIXcluster_log_f_post_b_cpp", (DL_FUNC) &_BNPMIXcluster_log_f_post_b_cpp, 5},
     {"_BNPMIXcluster_log_f_post_Lambda_jj_cpp", (DL_FUNC) &_BNPMIXcluster_log_f_post_Lambda_jj_cpp, 7},
     {"_BNPMIXcluster_log_f_post_Omega_cpp", (DL_FUNC) &_BNPMIXcluster_log_f_post_Omega_cpp, 5},
+    {"_BNPMIXcluster_log_f_post_a_cpp", (DL_FUNC) &_BNPMIXcluster_log_f_post_a_cpp, 6},
+    {"_BNPMIXcluster_log_f_post_b_cpp", (DL_FUNC) &_BNPMIXcluster_log_f_post_b_cpp, 5},
     {"_BNPMIXcluster_rtn1", (DL_FUNC) &_BNPMIXcluster_rtn1, 4},
     {"_BNPMIXcluster_RcppExport_registerCCallable", (DL_FUNC) &_BNPMIXcluster_RcppExport_registerCCallable, 0},
     {NULL, NULL, 0}

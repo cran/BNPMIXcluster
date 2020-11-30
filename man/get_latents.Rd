@@ -4,8 +4,14 @@
 \alias{get_latents}
 \title{Simulation of latent variables \eqn{Z} in the \emph{mixdpclust} model}
 \usage{
-get_latents(Y, var_type, mu_Z = NULL, sigma_Z = NULL, Z_old = NULL,
-  USING_CPP = TRUE)
+get_latents(
+  Y,
+  var_type,
+  mu_Z = NULL,
+  sigma_Z = NULL,
+  Z_old = NULL,
+  USING_CPP = TRUE
+)
 }
 \arguments{
 \item{Y}{Matrix or data frame containing the observed data.}
@@ -29,8 +35,8 @@ get_latents(Y, var_type, mu_Z = NULL, sigma_Z = NULL, Z_old = NULL,
 Simulates values for latent variables \eqn{Z=(Z_1,...,Z_q)} according to the specification in the \emph{mixdpclust} model.
 }
 \details{
-For each variable in the \code{Y} data frame, an associated continuos latent variable is generated.
-    if \eqn{Y_j} is continuos, the corresponding \eqn{Z_j} will keep the original values of \eqn{Y_j}.
+For each variable in the \code{Y} data frame, an associated continuous latent variable is generated.
+    if \eqn{Y_j} is continuous, the corresponding \eqn{Z_j} will keep the original values of \eqn{Y_j}.
     If \eqn{Y_j} is categorical, the function will scan the unique values of \eqn{Y_j} and generate continuous latent variables accordingly.
 }
 \keyword{internal}

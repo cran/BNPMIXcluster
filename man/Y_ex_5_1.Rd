@@ -4,12 +4,14 @@
 \name{Y_ex_5_1}
 \alias{Y_ex_5_1}
 \title{Simulated data for testing the \emph{BNPMIXcluster} package}
-\format{A list with three data frames.}
+\format{
+A list with three data frames.
+}
 \usage{
 Y_ex_5_1
 }
 \description{
-List with three data frames. Each dataset consists of the data Yi described in the exercise of section 5.1 in the article Carmona et al (2017).
+List with three data frames. Each dataset consists of the data \eqn{Y_i} described in the exercise of section 5.1 in the article Carmona et al (2017).
 
     The data \code{Y_ex_5_1} is a transformation of the simulated data \code{Z_latent_ex_5_1}.
 }

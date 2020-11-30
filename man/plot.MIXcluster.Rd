@@ -4,8 +4,12 @@
 \alias{plot.MIXcluster}
 \title{Plotting clustering results for "\code{MIXcluster}" objects}
 \usage{
-\method{plot}{MIXcluster}(x, type = c("heatmap", "chain")[1],
-  chain.obj = c("n.cluster", "a", "b", "Lambda", "Omega", "all")[1], ...)
+\method{plot}{MIXcluster}(
+  x,
+  type = c("heatmap", "chain")[1],
+  chain.obj = c("n.cluster", "a", "b", "Lambda", "Omega", "all")[1],
+  ...
+)
 }
 \arguments{
 \item{x}{an object of class "\code{MIXcluster}"}
